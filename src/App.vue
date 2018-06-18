@@ -5,6 +5,7 @@
 </template>
 
 <script>
+    import Lodash from 'lodash';
     export default {
         name: "App",
         data() {
@@ -28,16 +29,14 @@
                     that.resizeHtmlFontSize(that);
                 })();
             };
-            /** 窗口改变的时候*/
-            window.onresize = ()=>{
-                return (()=>{
-                    console.log(12323);
-                })();
-            }
+            /** 窗口改变的时候  _.debounce 是一个通过 lodash 限制操作频率的函数。*/
+            window.onresize = _.debounce(()=>{
+                that.resizeHtmlFontSize(that);
+            }, 400);
+
         },
         methods: {
             resizeHtmlFontSize(obj) {
-                console.log(obj.rootHTML);
                 let deviceWidth = document.documentElement.clientWidth;
                 let nowDesignResolution = 0;
                 if ( deviceWidth < 980) {
