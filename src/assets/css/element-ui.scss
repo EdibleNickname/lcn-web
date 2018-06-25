@@ -1,0 +1,19 @@
+/** element-ui 样式重置*/
+
+.el-input {
+  .el-input__inner {
+    height: 0.15rem;
+    line-height: 0.15rem;
+    font-size: 0.06rem;
+  }
+}
+
+.el-button{
+  height: 0.15rem;
+  padding: 0 0.08rem;
+  span {
+    font-size: 0.06rem;
+    line-height: 0.15rem;
+    height: 0.15rem;
+  }
+}
