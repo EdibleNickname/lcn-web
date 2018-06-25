@@ -2,7 +2,7 @@
     <div class="register">
        <div class="content">
 
-           <!--logo和注册的标题-->
+           <!--logo和注册的标题 -->
            <div class="header">
                <img src="../assets/logo.png"/>
                <span>注册</span>
