@@ -1,6 +1,15 @@
 /** element-ui 样式重置*/
 
+.el-col{
+  height: 0.15rem;
+}
+
+.el-row {
+  height: 0.15rem;
+}
+
 .el-input {
+  height: 0.2rem;
   .el-input__inner {
     height: 0.15rem;
     line-height: 0.15rem;
