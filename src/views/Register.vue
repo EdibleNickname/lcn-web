@@ -95,7 +95,7 @@
                        </el-col>
                        <el-col :span="8">
                            <el-button v-if="captcha.showTimer" type="primary" @click="showDialog">获取验证码</el-button>
-                           <el-button v-else type="info" disabled>60 s</el-button>
+                           <el-button v-else type="info" disabled>{{captcha.time}} s</el-button>
                        </el-col>
                    </el-row>
 
@@ -173,6 +173,8 @@
                     showTimer : true,
                     /** 倒计时时间*/
                     time : 60,
+                    /** 邮箱验证码是否过期了*/
+                    eMailCaptcha: true,
                 },
 
                 /** 为了验证时，第一次不显示错误信息 */
@@ -269,6 +271,7 @@
                     this.firstStatus.emailFirst = true;
                     return;
                 }
+                //获取验证码
                 this.getCaptcha();
                 this.captcha.dialogVisible = true;
             },
@@ -311,9 +314,42 @@
 
                         _this.captcha.dialogVisible = false;
                         _this.captcha.answer = "";
+                        _this.captcha.showTimer = false;
+                        _this.captchaTimer();
+                        _this.showSuccessHint();
                     }
                 );
 
+            },
+
+            /** 验证码有效期计时器*/
+            captchaTimer() {
+                this.captcha.time = 60;
+                let _this = this;
+                let timer = setInterval(()=>{
+                    if(_this.captcha.time == 0) {
+                        _this.captcha.showTimer = true;
+                        _this.captcha.eMailCaptcha = true;
+                        clearInterval(timer);
+                    }
+                    _this.captcha.time -- ;
+                }, 1000);
+            },
+
+            /** 成功提示*/
+            showSuccessHint() {
+
+                if(this.captcha.eMailCaptcha) {
+                    // 邮箱验证码设值为未过期
+                    this.captcha.eMailCaptcha = false;
+                }
+
+                this.$message({
+                    showClose: true,
+                    message: "验证码已发送到您的邮箱，请注意查收",
+                    type: 'success',
+                    duration: 3000,
+                });
             },
 
             /** 获取验证码*/
@@ -349,6 +385,18 @@
                     return;
                 }
 
+                // 邮箱验证码已过期
+                if(this.captcha.eMailCaptcha) {
+                    this.$message({
+                        showClose: true,
+                        message: "您的验证码已过期，重新获取一个吧",
+                        type: 'warning'
+                    });
+
+                    return;
+                }
+
+                let url = "";
                 //验证成功了
                 console.log("验证成功")
             },

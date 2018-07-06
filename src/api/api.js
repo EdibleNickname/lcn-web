@@ -1,9 +1,7 @@
 import axios from 'axios';
 import qs from 'qs';
 
-// http://localhost:81
-let base = '';
-let timeout = 5000;
+import { Message } from 'element-ui';
 
 //基础的api部分
 axios.defaults.baseURL = "http://localhost:81";
@@ -18,6 +16,7 @@ axios.interceptors.request.use(
     err => {
         console.log("网络出错了");
         console.log(err);
+        Message.error({message: '请求超时 !'});
     }
 );
 
@@ -28,7 +27,7 @@ axios.interceptors.response.use(
     },
     err => {
         console.log("网络异常");
-        console.log(err);
+        Message.error({message: '网络出错了!'});
     }
 );
 

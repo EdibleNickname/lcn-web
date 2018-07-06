@@ -1,5 +1,6 @@
 /** element-ui 样式重置*/
 
+// 注册页面
 .el-col{
   height: 0.15rem;
 }
@@ -8,7 +9,6 @@
   height: 0.15rem;
 }
 
-// 注册页面
 .el-input {
   height: 0.2rem;
   .el-input__inner {
@@ -36,4 +36,21 @@
     border-top: 1px #ddd solid;
     padding-bottom: 10px;
   }
+}
+
+.el-message--success {
+   background-color: rgba(64, 158, 255, 0.4);
+   border-color: rgba(51, 255, 255,1);
+
+  .el-message__content {
+    color: rgba(102, 255, 204, 1);
+  }
+}
+
+.el-message .el-icon-success {
+  color: rgba(102, 255, 204, 1);
+}
+
+.el-message__closeBtn {
+  color: rgba(102, 255, 204, 1);
 }
