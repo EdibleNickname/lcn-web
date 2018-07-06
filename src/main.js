@@ -1,21 +1,25 @@
 import Vue from 'vue';
 import router from './router/router';
 import store from './store/store';
-
+/** element UI界面 */
+import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 /** 需要放在element-ui的后面，否则放在App.vue里面的样式无法覆盖上面的样式*/
 import App from './App.vue';
-
-
-/** element UI界面 */
-import ElementUI from 'element-ui';
 /** 参数验证 */
 import Vuelidate from 'vuelidate';
+/** 网络请求 */
+import {$get} from './api/api.js';
 
-Vue.config.productionTip = false;
+/** 打印启动的错误日志 */
+Vue.config.productionTip = true;
 
-Vue.use(ElementUI);
 Vue.use(Vuelidate);
+Vue.use(ElementUI);
+
+/** 全局挂账get请求方法*/
+Vue.prototype.$get = $get;
+
 
 new Vue({
   router,

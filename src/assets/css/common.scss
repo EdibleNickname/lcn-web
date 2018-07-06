@@ -4,6 +4,10 @@
   color: #409EFF;
 }
 
+@mixin theme-background {
+  background: #409EFF;
+}
+
 /** 左右居中 */
 @mixin row-center {
   display: flex;

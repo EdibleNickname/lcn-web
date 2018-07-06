@@ -1,7 +1,7 @@
 <template>
     <div class="register">
-       <div class="content">
-
+        <!--用户信息输入区-->
+        <div class="content">
            <!--logo和注册的标题-->
            <div class="header">
                <img src="../assets/logo.png"/>
@@ -17,13 +17,15 @@
                            <label>用户名</label>
                        </el-col>
                        <el-col :span="19">
-                           <el-input placeholder="请输入用户名" v-model.trim="newUser.userName" @blur="changeUserNameFirstStatus"/>
+                           <el-input placeholder="请输入用户名"
+                                     v-model.trim="newUser.userName"
+                                     @blur="changeUserNameFirstStatus"/>
                        </el-col>
                    </el-row>
                    <div class="error-hint">
                        <span v-if="userNameRequired">用户名不能为空哦</span>
                        <span v-if="!$v.newUser.userName.minLength">用户名的长度需要大于{{$v.newUser.userName.$params.minLength.min}}哦</span>
-                       <span class="none">用户名已被注册了</span>
+                       <span v-if="$v.newUser.userName.isUnique">用户名已被注册了</span>
                    </div>
                </div>
 
@@ -33,13 +35,15 @@
                            <label>邮箱</label>
                        </el-col>
                        <el-col :span="19">
-                           <el-input  placeholder="请输入您的邮箱" v-model.trim="newUser.email" @blur="changeEmailFirstStatus"/>
+                           <el-input  placeholder="请输入您的邮箱"
+                                      v-model.trim="newUser.email"
+                                      @blur="changeEmailFirstStatus"/>
                        </el-col>
                    </el-row>
                    <div class="error-hint">
                        <span v-if="emailRequired">邮箱不能为空哦</span>
                        <span v-if="!$v.newUser.email.email" >邮箱的格式出错了</span>
-                       <span class="none">邮箱已被注册了</span>
+                       <span v-if="$v.newUser.email.isUnique">邮箱已被注册了</span>
                    </div>
                </div>
 
@@ -85,13 +89,13 @@
                <div class="auth-code-wrapper">
                    <el-row type="flex" justify="end">
                        <el-col :span="11">
-                           <el-input  placeholder="验证码" v-model.trim="newUser.authCode" @blur="changeAuthCodeFirstStatus"/>
+                           <el-input  placeholder="验证码"
+                                      v-model.trim="newUser.authCode"
+                                      @blur="changeAuthCodeFirstStatus"/>
                        </el-col>
                        <el-col :span="8">
-                           <el-button type="primary">获取验证码</el-button>
-                       </el-col>
-                       <el-col :span="8" class="none">
-                           <el-button type="info" disabled>60 s</el-button>
+                           <el-button v-if="captcha.showTimer" type="primary" @click="showDialog">获取验证码</el-button>
+                           <el-button v-else type="info" disabled>60 s</el-button>
                        </el-col>
                    </el-row>
 
@@ -109,6 +113,29 @@
            </div>
 
        </div>
+
+        <!--弹窗-->
+        <div class="captcha-dialog">
+            <el-dialog :visible.sync="captcha.dialogVisible" width="30%" center>
+                <span slot="title" class="el-dialog__title">
+                    <div class="title">
+                        <span class="line"></span>
+                        <span>请输入验证码</span>
+                    </div>
+                </span>
+                <div class="body">
+                    <img :src="captcha.img"/>
+                    <div v-if="captcha.captchaResult">{{captcha.captchaHint}}</div>
+                    <div class="replace" @click="getCaptcha">换一张</div>
+                    <input type="text"  v-model="captcha.answer" placeholder="请输入图片中的内容" @focus="cleanHint"/>
+                </div>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="cancelDialog">取 消</el-button>
+                    <el-button type="primary" @click="captchaConfirm">确 定</el-button>
+                </div>
+            </el-dialog>
+        </div>
+
     </div>
 </template>
 
@@ -121,10 +148,31 @@
                 /** 业务数据 */
                 newUser: {
                     userName: "",
-                    email: "",
+                    email: "licanxin@eigpay.net",
                     password: "",
                     confirmPwd: "",
                     authCode: "",
+                },
+                /** 验证码操作*/
+                captcha: {
+                    /** 控制弹弹窗的消失或出现*/
+                    dialogVisible: false,
+                    /**加载验证码的等待图片*/
+                    img: require("../assets/img/common/loading.gif"),
+                    /** redis存放验证码答案对应的key */
+                    redisKey: "",
+                    /**控制错误提示框的出现消失*/
+                    captchaResult: false,
+                    /** 验证码错误提示*/
+                    captchaHint: "验证码错误",
+                    /**用户输入的验证码答案*/
+                    answer: "",
+                    /** 验证码的长度*/
+                    length: 4,
+                    /** 展示倒计时 */
+                    showTimer : true,
+                    /** 倒计时时间*/
+                    time : 60,
                 },
 
                 /** 为了验证时，第一次不显示错误信息 */
@@ -173,11 +221,34 @@
             newUser: {
                 userName: {
                     required,
-                    minLength: minLength(2),
+                    minLength: minLength(3),
+                    async isUnique (value) {
+                        if (value === ''){
+                            return false;
+                        }
+                        if (value.length < 3) {
+                            return false;
+                        }
+                        // 拼接验证用户名是否存在的api
+                        let url = "/open/register/queryUserNameIsExist/"+ value;
+                        const data = await this.$get(url);
+                        return Boolean(data);
+                    }
                 },
                 email: {
                     required,
                     email,
+                    async isUnique (value) {
+                        if (value === ''){
+                            return false;
+                        }
+                        if(!this.$v.newUser.email.email) {
+                            return false;
+                        }
+                        let url = "/open/register/"+encodeURIComponent(value)+"/queryEMailIsExist";
+                        const data = await this.$get(url);
+                        return Boolean(data);
+                    }
                 },
                 password: {
                     required,
@@ -190,6 +261,73 @@
             }
         },
         methods : {
+            /** 验证码弹窗*/
+            showDialog(){
+                //需要先确定邮箱填过了，才能在验证码验证通过后，发送邮件到邮箱
+                let emailRegx = /^([a-z0-9A-Z]+[-|\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\.)+[a-zA-Z]{2,}$/;
+                if(!emailRegx.test(this.newUser.email)){
+                    this.firstStatus.emailFirst = true;
+                    return;
+                }
+                this.getCaptcha();
+                this.captcha.dialogVisible = true;
+            },
+
+            /** 验证码弹窗消失*/
+            cancelDialog() {
+                this.captcha.dialogVisible = false;
+                this.captcha.answer = "";
+            },
+
+            /** 去除验证码错误的提示*/
+            cleanHint() {
+                if(this.captcha.captchaResult) {
+                    this.captcha.captchaResult = false;
+                    this.captcha.answer = "";
+                }
+            },
+
+            /**验证码提交*/
+            captchaConfirm() {
+                if(this.captcha.answer.length != this.captcha.length) {
+                    this.captcha.captchaResult = true;
+                    return;
+                }
+                var regx = /^([a-zA-Z]|\d){4}$/;
+                if(!regx.test(this.captcha.answer)) {
+                    this.captcha.captchaResult = true;
+                    return;
+                }
+                let url = "/open/register/validCaptcha/"+ this.captcha.answer +"/"+ encodeURIComponent(this.newUser.email) + "/" + this.captcha.redisKey;
+                let _this = this;
+                this.$get(url).then(
+                    resp => {
+                        console.log(resp);
+                        if(!resp.answer) {
+                            _this.captcha.captchaResult = true;
+                            _this.getCaptcha();
+                            return;
+                        }
+
+                        _this.captcha.dialogVisible = false;
+                        _this.captcha.answer = "";
+                    }
+                );
+
+            },
+
+            /** 获取验证码*/
+            getCaptcha() {
+                let url = "/open/captcha/generateCaptcha";
+                let _this= this;
+                this.$get(url).then(
+                    resp => {
+                        _this.captcha.img = 'data:image/jpeg;base64,'+resp.captchaImg;
+                        _this.captcha.redisKey = resp.redisKey;
+                    }
+                );
+            },
+
             /** 业务方法 */
             register(value){
                 // 去掉自定义的变量，避免影响vuelidate的验证
@@ -212,8 +350,7 @@
                 }
 
                 //验证成功了
-                console.log("验证成功");
-
+                console.log("验证成功")
             },
 
             /** 为了验证时，第一次不显示错误信息 */
@@ -248,7 +385,7 @@
                     this.verifyConfirmPwdSameAs = false;
                 }
             }
-        }
+        },
     }
 </script>
 
@@ -262,7 +399,6 @@
         background: url("../assets/img/register/register-bg.png") no-repeat fixed;
         background-size: 100% 100%;
         position: relative;
-        z-index: 1;
         &:after {
             content: "";
             width: 100vw;
@@ -275,7 +411,7 @@
         }
         .content {
             position: absolute;
-            z-index:3;
+            z-index: 3;
             width: 30%;
             background: rgba(255, 255, 255, 0.4);
             margin-left: 35%;
@@ -362,13 +498,57 @@
                 display: flex;
                 justify-content: center;
                 button {
-
                     &:first-child {
                         margin-right: 0.2rem;
                         margin-left: 0.2rem;
                     }
                 }
 
+            }
+        }
+
+        .captcha-dialog {
+            .body {
+                flex-direction: column;
+                @include layout-center;
+                img {
+                    margin-bottom: 10px;
+                    height: 0.16rem;
+                    width: 0.48rem;
+                }
+                div {
+                    color: red;
+                    margin-bottom: 0.02rem;
+                }
+                .replace {
+                    @include theme-color;
+                    font-size: 0.06rem;
+                    margin-bottom: 0.05rem;
+                    &:hover {
+                        cursor: pointer;
+                        color: deepskyblue;
+                    }
+                }
+                input {
+                    border: none;
+                    outline: none;
+                    border-bottom: 1px solid #ddd;
+                    padding: 0.01rem;
+                    height: 0.1rem;
+                    text-align: center;
+                    color: #a5a5a5;
+                    font-weight: 500;
+                    font-size: 0.06rem;
+                }
+            }
+
+            .dialog-footer {
+                button {
+                    width: 0.4rem;
+                }
+                button:first-child{
+                    margin-right: 0.5rem;
+                }
             }
         }
 
