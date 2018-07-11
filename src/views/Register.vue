@@ -17,15 +17,13 @@
                            <label>用户名</label>
                        </el-col>
                        <el-col :span="19">
-                           <el-input placeholder="请输入用户名"
-                                     v-model.trim="newUser.userName"
-                                     @blur="changeUserNameFirstStatus"/>
+                           <el-input placeholder="请输入用户名" />
                        </el-col>
                    </el-row>
                    <div class="error-hint">
-                       <span v-if="userNameRequired">用户名不能为空哦</span>
-                       <span v-if="!$v.newUser.userName.minLength">用户名的长度需要大于{{$v.newUser.userName.$params.minLength.min}}哦</span>
-                       <span v-if="$v.newUser.userName.isUnique">用户名已被注册了</span>
+                       <span v-if="true">用户名不能为空哦</span>
+                       <span v-if="true">用户名的长度需要大于3哦</span>
+                       <span v-if="true">用户名已被注册了</span>
                    </div>
                </div>
 
@@ -35,15 +33,13 @@
                            <label>邮箱</label>
                        </el-col>
                        <el-col :span="19">
-                           <el-input  placeholder="请输入您的邮箱"
-                                      v-model.trim="newUser.email"
-                                      @blur="changeEmailFirstStatus"/>
+                           <el-input  placeholder="请输入您的邮箱"/>
                        </el-col>
                    </el-row>
                    <div class="error-hint">
-                       <span v-if="emailRequired">邮箱不能为空哦</span>
-                       <span v-if="!$v.newUser.email.email" >邮箱的格式出错了</span>
-                       <span v-if="$v.newUser.email.isUnique">邮箱已被注册了</span>
+                       <span v-if="true">邮箱不能为空哦</span>
+                       <span v-if="true">邮箱的格式出错了</span>
+                       <span v-if="true">邮箱已被注册了</span>
                    </div>
                </div>
 
@@ -54,15 +50,13 @@
                            <label>密码</label>
                        </el-col>
                        <el-col :span="19">
-                           <el-input type="password" placeholder="请输入您的密码"
-                                     v-model.trim="newUser.password"
-                                     @blur="changePasswordFirstStatus"/>
+                           <el-input type="password" placeholder="请输入您的密码" />
                        </el-col>
                    </el-row>
 
                    <div class="error-hint">
-                       <span v-if="passwordRequired">密码不能为空哦</span>
-                       <span v-if="!$v.newUser.password.minLength" >密码的长度需要大于{{$v.newUser.password.$params.minLength.min}}哦</span>
+                       <span v-if="true">密码不能为空哦</span>
+                       <span v-if="true" >密码的长度需要大于6哦</span>
                    </div>
 
                </div>
@@ -73,15 +67,12 @@
                            <label>重复密码</label>
                        </el-col>
                        <el-col :span="19">
-                           <el-input  type="password" placeholder="再输一次密码吧"
-                                      v-model.trim="newUser.confirmPwd"
-                                      @focus="stopVerifyConfirmPwd"
-                                      @blur="startVerifyConfirmPwd"/>
+                           <el-input  type="password" placeholder="再输一次密码吧" />
                        </el-col>
                    </el-row>
 
                    <div class="error-hint">
-                       <span v-if="confirmPwdSameAs">2次密码不一样哦</span>
+                       <span v-if="true">2次密码不一样哦</span>
                    </div>
 
                </div>
@@ -89,9 +80,7 @@
                <div class="auth-code-wrapper">
                    <el-row type="flex" justify="end">
                        <el-col :span="11">
-                           <el-input  placeholder="验证码"
-                                      v-model.trim="newUser.authCode"
-                                      @blur="changeAuthCodeFirstStatus"/>
+                           <el-input  placeholder="验证码" />
                        </el-col>
                        <el-col :span="8">
                            <el-button v-if="captcha.showTimer" type="primary" @click="showDialog">获取验证码</el-button>
@@ -100,7 +89,7 @@
                    </el-row>
 
                    <div class="error-hint">
-                       <span v-if="authCodeRequired">验证码不能为空哦</span>
+                       <span v-if="true">验证码不能为空哦</span>
                    </div>
 
                </div>
@@ -140,8 +129,6 @@
 </template>
 
 <script>
-    import { required, minLength, email, sameAs } from 'vuelidate/lib/validators';
-
     export default {
         name: "register",
         data() {
@@ -178,93 +165,6 @@
                     /** 邮箱验证码是否过期了*/
                     eMailCaptcha: true,
                 },
-
-                /** 为了验证时，第一次不显示错误信息 */
-                firstStatus: {
-                    userNameFirst: false,
-                    emailFirst: false,
-                    passwordFirst: false,
-                    authCodeFirst: false,
-                },
-                verifyConfirmPwdSameAs: false,
-            }
-        },
-        computed: {
-            userNameRequired() {
-                if(!this.firstStatus.userNameFirst) {
-                    return this.firstStatus.userNameFirst;
-                }
-               return  !this.$v.newUser.userName.required;
-            },
-            emailRequired() {
-                if(!this.firstStatus.emailFirst) {
-                    return this.firstStatus.emailFirst;
-                }
-                return  !this.$v.newUser.email.required;
-            },
-            passwordRequired() {
-                if(!this.firstStatus.passwordFirst) {
-                    return this.firstStatus.passwordFirst;
-                }
-                return  !this.$v.newUser.password.required;
-            },
-            confirmPwdSameAs() {
-                if(!this.verifyConfirmPwdSameAs){
-                    return this.verifyConfirmPwdSameAs;
-                }
-                return !this.$v.newUser.confirmPwd.sameAsPassword;
-            },
-            authCodeRequired() {
-                if(!this.firstStatus.authCodeFirst){
-                    return this.firstStatus.authCodeFirst;
-                }
-                return !this.$v.newUser.authCode.required;
-            }
-        },
-        validations: {
-            newUser: {
-                userName: {
-                    required,
-                    minLength: minLength(3),
-                    async isUnique (value) {
-                        if (value === ''){
-                            return false;
-                        }
-                        if (value.length < 3) {
-                            return false;
-                        }
-                        // 拼接验证用户名是否存在的api
-                        let url = "/open/register/queryUserNameIsExist/"+ value;
-                        const data = await this.$get(url);
-                        return Boolean(data);
-                    }
-                },
-                email: {
-                    required,
-                    email,
-                    async isUnique (value) {
-                        if (value === ''){
-                            return false;
-                        }
-                        if(!this.$v.newUser.email.email) {
-                            return false;
-                        }
-                        let url = "/open/register/"+encodeURIComponent(value)+"/queryEMailIsExist";
-                        const data = await this.$get(url);
-                        return Boolean(data);
-                    }
-                },
-                password: {
-                    required,
-                    minLength: minLength(6),
-                },
-                confirmPwd: {
-                    required,
-                    sameAsPassword: sameAs('password'),
-                },
-                authCode: {
-                    required,
-                }
             }
         },
         methods : {
@@ -273,7 +173,7 @@
                 //需要先确定邮箱填过了，才能在验证码验证通过后，发送邮件到邮箱
                 let emailRegx = /^([a-z0-9A-Z]+[-|\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\.)+[a-zA-Z]{2,}$/;
                 if(!emailRegx.test(this.newUser.email)){
-                    this.firstStatus.emailFirst = true;
+                    // 提示邮箱需要输入
                     return;
                 }
                 //获取验证码
@@ -355,27 +255,6 @@
 
             /** 业务方法 */
             register(value){
-
-                // 去掉自定义的变量，避免影响vuelidate的验证
-                this.firstStatus.userNameFirst = true;
-                this.firstStatus.emailFirst = true;
-                this.firstStatus.passwordFirst = true;
-                this.verifyConfirmPwdSameAs = true;
-                this.firstStatus.authCodeFirst = true;
-
-                // 对所有的值进行验证
-                value.$touch();
-                console.log(value.$error);
-                if(value.$error){
-                    // 验证失败了
-                    this.firstStatus.userNameFirst = false;
-                    this.firstStatus.emailFirst = false;
-                    this.firstStatus.passwordFirst = false;
-                    this.verifyConfirmPwdSameAs = false;
-                    this.firstStatus.authCodeFirst = false;
-                    return;
-                }
-
                 // 邮箱验证码已过期
                 if(this.captcha.eMailCaptcha) {
                     this.showErrorHint("您的验证码已过期，重新获取一个吧");
@@ -434,39 +313,6 @@
                     type: 'warning',
                 });
             },
-
-            /** 为了验证时，第一次不显示错误信息 */
-            changeUserNameFirstStatus() {
-                if (!this.firstStatus.userNameFirst) {
-                    this.firstStatus.userNameFirst = true;
-                }
-            },
-            changeEmailFirstStatus() {
-                if (!this.firstStatus.emailFirst) {
-                    this.firstStatus.emailFirst = true;
-                }
-            },
-            changePasswordFirstStatus() {
-                if (!this.firstStatus.passwordFirst) {
-                    this.firstStatus.passwordFirst = true;
-                }
-            },
-            changeAuthCodeFirstStatus() {
-                if (!this.firstStatus.authCodeFirst) {
-                    this.firstStatus.authCodeFirst = true;
-                }
-            },
-
-            startVerifyConfirmPwd() {
-                if(!this.verifyConfirmPwdSameAs){
-                    this.verifyConfirmPwdSameAs = true;
-                }
-            },
-            stopVerifyConfirmPwd() {
-                if(this.verifyConfirmPwdSameAs){
-                    this.verifyConfirmPwdSameAs = false;
-                }
-            }
         },
     }
 </script>
