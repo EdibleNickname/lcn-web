@@ -9,7 +9,7 @@ import App from './App.vue';
 /** 参数验证 */
 import Vuelidate from 'vuelidate';
 /** 网络请求 */
-import {$get} from './api/api.js';
+import {$get, $post} from './api/api.js';
 
 /** 打印启动的错误日志 */
 Vue.config.productionTip = true;
@@ -19,6 +19,7 @@ Vue.use(ElementUI);
 
 /** 全局挂账get请求方法*/
 Vue.prototype.$get = $get;
+Vue.prototype.$post = $post;
 
 
 new Vue({

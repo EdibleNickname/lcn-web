@@ -8,6 +8,8 @@ axios.defaults.baseURL = "http://localhost:81";
 //请求超时时间
 axios.defaults.timeout = 5000;
 
+axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
+
 /** 请求发出之前处理器 */
 axios.interceptors.request.use(
     config => {
@@ -34,6 +36,14 @@ axios.interceptors.response.use(
 export const $get = (url) => {
     return axios({
         method: 'get',
-        url: `${url}`,
+        url,
+    });
+};
+
+export const $post = (url, data) => {
+    return axios({
+        method: 'post',
+        url,
+        data: qs.stringify(data),
     });
 };

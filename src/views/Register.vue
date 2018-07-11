@@ -141,6 +141,7 @@
 
 <script>
     import { required, minLength, email, sameAs } from 'vuelidate/lib/validators';
+
     export default {
         name: "register",
         data() {
@@ -152,6 +153,7 @@
                     password: "",
                     confirmPwd: "",
                     authCode: "",
+                    eMailRedisKey: "",
                 },
                 /** 验证码操作*/
                 captcha: {
@@ -216,7 +218,7 @@
                 if(!this.firstStatus.authCodeFirst){
                     return this.firstStatus.authCodeFirst;
                 }
-                return !this.firstStatus.authCodeFirst.required;
+                return !this.$v.newUser.authCode.required;
             }
         },
         validations: {
@@ -259,6 +261,9 @@
                 confirmPwd: {
                     required,
                     sameAsPassword: sameAs('password'),
+                },
+                authCode: {
+                    required,
                 }
             }
         },
@@ -305,16 +310,16 @@
                 let _this = this;
                 this.$get(url).then(
                     resp => {
-                        console.log(resp);
-                        if(!resp.answer) {
+                        if(resp.answer != "success") {
                             _this.captcha.captchaResult = true;
                             _this.getCaptcha();
                             return;
                         }
-
+                        // 验证码验证通过
                         _this.captcha.dialogVisible = false;
                         _this.captcha.answer = "";
                         _this.captcha.showTimer = false;
+                        _this.newUser.eMailRedisKey = resp.eMailRedisKey;
                         _this.captchaTimer();
                         _this.showSuccessHint();
                     }
@@ -336,6 +341,75 @@
                 }, 1000);
             },
 
+            /** 获取验证码*/
+            getCaptcha() {
+                let url = "/open/captcha/generateCaptcha";
+                let _this= this;
+                this.$get(url).then(
+                    resp => {
+                        _this.captcha.img = 'data:image/jpeg;base64,'+resp.captchaImg;
+                        _this.captcha.redisKey = resp.redisKey;
+                    }
+                );
+            },
+
+            /** 业务方法 */
+            register(value){
+
+                // 去掉自定义的变量，避免影响vuelidate的验证
+                this.firstStatus.userNameFirst = true;
+                this.firstStatus.emailFirst = true;
+                this.firstStatus.passwordFirst = true;
+                this.verifyConfirmPwdSameAs = true;
+                this.firstStatus.authCodeFirst = true;
+
+                // 对所有的值进行验证
+                value.$touch();
+                console.log(value.$error);
+                if(value.$error){
+                    // 验证失败了
+                    this.firstStatus.userNameFirst = false;
+                    this.firstStatus.emailFirst = false;
+                    this.firstStatus.passwordFirst = false;
+                    this.verifyConfirmPwdSameAs = false;
+                    this.firstStatus.authCodeFirst = false;
+                    return;
+                }
+
+                // 邮箱验证码已过期
+                if(this.captcha.eMailCaptcha) {
+                    this.showErrorHint("您的验证码已过期，重新获取一个吧");
+                    return;
+                }
+
+                // 请求参数
+                let data = {
+                    userName : this.newUser.userName,
+                    password : this.newUser.password,
+                    eMail : this.newUser.email,
+                    authCode : this.newUser.authCode,
+                    eMailRedisKey: this.newUser.eMailRedisKey,
+                };
+
+                let url = "/open/register/registerUser";
+                let _this = this;
+                this.$post(url, data).then(
+                    resp => {
+                        console.log(resp);
+                        // 失败
+                        if (resp.answer != "success") {
+                            _this.showErrorHint(resp.hint);
+                            return;
+                        }
+                        // 注册成功
+                        console.log("成功");
+
+                    },
+                );
+                //验证成功了
+                console.log("验证成功")
+            },
+
             /** 成功提示*/
             showSuccessHint() {
 
@@ -352,53 +426,13 @@
                 });
             },
 
-            /** 获取验证码*/
-            getCaptcha() {
-                let url = "/open/captcha/generateCaptcha";
-                let _this= this;
-                this.$get(url).then(
-                    resp => {
-                        _this.captcha.img = 'data:image/jpeg;base64,'+resp.captchaImg;
-                        _this.captcha.redisKey = resp.redisKey;
-                    }
-                );
-            },
-
-            /** 业务方法 */
-            register(value){
-                // 去掉自定义的变量，避免影响vuelidate的验证
-                this.firstStatus.userNameFirst = true;
-                this.firstStatus.emailFirst = true;
-                this.firstStatus.passwordFirst = true;
-                this.verifyConfirmPwdSameAs = true;
-                this.firstStatus.authCodeFirst = true;
-
-                // 对所有的值进行验证
-                value.$touch();
-                if(value.$error){
-                    // 验证失败了
-                    this.firstStatus.userNameFirst = false;
-                    this.firstStatus.emailFirst = false;
-                    this.firstStatus.passwordFirst = false;
-                    this.verifyConfirmPwdSameAs = false;
-                    this.firstStatus.authCodeFirst = false;
-                    return;
-                }
-
-                // 邮箱验证码已过期
-                if(this.captcha.eMailCaptcha) {
-                    this.$message({
-                        showClose: true,
-                        message: "您的验证码已过期，重新获取一个吧",
-                        type: 'warning'
-                    });
-
-                    return;
-                }
-
-                let url = "";
-                //验证成功了
-                console.log("验证成功")
+            /** 失败提示 */
+            showErrorHint(hint) {
+                this.$message({
+                    showClose: true,
+                    message: hint,
+                    type: 'warning',
+                });
             },
 
             /** 为了验证时，第一次不显示错误信息 */
