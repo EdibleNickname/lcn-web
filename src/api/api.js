@@ -1,6 +1,4 @@
 import axios from 'axios';
-import qs from 'qs';
-
 import { Message } from 'element-ui';
 
 //基础的api部分
@@ -44,6 +42,6 @@ export const $post = (url, data) => {
     return axios({
         method: 'post',
         url,
-        data: qs.stringify(data),
+        data: JSON.stringify(data),
     });
 };
