@@ -1,16 +1,18 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 
-Vue.use(Vuex)
+import CommonModule from './common/CommonModule'
 
-export default new Vuex.Store({
-  state: {
+Vue.use(Vuex);
 
-  },
-  mutations: {
+// 是否开启严格模式
+const debug = process.env.NODE_ENV !== 'production';
 
-  },
-  actions: {
+const store = new Vuex.Store({
+    modules: {
+        CommonModule,
+    },
+    strict: debug,
+});
 
-  }
-})
+export default store;

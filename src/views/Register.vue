@@ -9,7 +9,7 @@
            </div>
 
            <!--注册填的内容 -->
-           <div class="msg">
+           <div class="msg" @keydown="registerSubmit($event)">
 
                <div class="input-wrapper">
                    <el-row type="flex">
@@ -102,7 +102,7 @@
        </div>
 
         <!--弹窗-->
-        <div class="captcha-dialog">
+        <div class="captcha-dialog" @keydown="captchaSubmit($event)">
             <el-dialog :visible.sync="captcha.dialogVisible" width="30%" center>
                 <span slot="title" class="el-dialog__title">
                     <div class="title">
@@ -112,7 +112,9 @@
                 </span>
                 <div class="body">
                     <img :src="captcha.img"/>
-                    <div v-if="captcha.captchaResult">{{captcha.captchaHint}}</div>
+                    <transition name="slide-fade">
+                        <div v-show="captcha.captchaResult">验证码错误</div>
+                    </transition>
                     <div class="replace" @click="getCaptcha">换一张</div>
                     <input type="text"  v-model="captcha.answer" placeholder="请输入图片中的内容" @focus="cleanHint"/>
                 </div>
@@ -127,17 +129,19 @@
 </template>
 
 <script>
-    import qs from 'qs';
+    import { mapMutations } from 'vuex';
+    import Storage from '../utils/storage';
+
     export default {
         name: "register",
         data() {
             return{
                 /** 业务数据 */
                 newUser: {
-                    userName: "123",
-                    email: "licanxin@eigpay.net",
-                    password: "123456",
-                    confirmPwd: "123456",
+                    userName: "",
+                    email: "",
+                    password: "",
+                    confirmPwd: "",
                     authCode: "",
                     eMailRedisKey: "",
                 },
@@ -157,8 +161,6 @@
                     redisKey: "",
                     /**控制错误提示框的出现消失*/
                     captchaResult: false,
-                    /** 验证码错误提示*/
-                    captchaHint: "验证码错误",
                     /**用户输入的验证码答案*/
                     answer: "",
                     /** 验证码的长度*/
@@ -178,6 +180,7 @@
              *  type : 01 取消验证  02 开始验证
              */
             async checkUserNameUnique(type){
+
                 if(type == '01') {
                     if(this.unique.userNameUnique) {
                         this.unique.userNameUnique = false;
@@ -194,7 +197,8 @@
                 this.unique.userNameUnique = Boolean(data);
             },
 
-            /** 验证邮箱是否唯一
+            /**
+             *  验证邮箱是否唯一
              *  type : 01 取消验证  02 开始验证
              */
             async checkEmailUnique(type){
@@ -215,7 +219,7 @@
                 this.unique.emailUnique = Boolean(data);
             },
 
-            /** 获取验证码*/
+            /** 获取验证码 */
             getCaptcha() {
                 let url = "/open/captcha/generateCaptcha";
                 this.$get(url).then(
@@ -226,7 +230,7 @@
                 );
             },
 
-            /**验证码验证*/
+            /** 验证码验证 */
             captchaConfirm() {
                 // 输入的验证码的长度不对
                 if(this.captcha.answer.length != this.captcha.length) {
@@ -260,6 +264,17 @@
 
             /** 业务方法 */
             register(){
+
+                // 用户名重复了
+                if(this.unique.userNameUnique) {
+                    return;
+                }
+
+                // 邮箱重复了
+                if(this.unique.emailUnique) {
+                    return;
+                }
+
                 this.$validator.validate().then((result) => {
                     if(!result) {
                         // 有参数未填或格式出错
@@ -283,40 +298,44 @@
                     let url = "/open/register/registerUser";
                     this.$post(url, data).then( resp => {
                         console.log(resp);
-                    });
-                });
-
-
-/*                // 邮箱验证码已过期
-                if(this.captcha.eMailCaptcha) {
-                    this.showMessage("01", "您的验证码已过期，重新获取一个吧");
-                    return;
-                }
-
-                // 请求参数
-                let data = {
-                    userName : this.newUser.userName,
-                    password : this.newUser.password,
-                    eMail : this.newUser.email,
-                    authCode : this.newUser.authCode,
-                    eMailRedisKey: this.newUser.eMailRedisKey,
-                };
-
-                let url = "/open/register/registerUser";
-                let _this = this;
-                this.$post(url, data).then(
-                    resp => {
-                        console.log(resp);
-                        // 失败
-                        if (resp.answer != "success") {
-                            _this.showMessage("01",resp.hint);
+                        // 验证成功
+                        if(resp.answer != "success") {
+                            this.showMessage('01', resp.hint);
+                            this.newUser.authCode = "";
                             return;
                         }
-                        // 注册成功
-                        console.log("成功");
 
-                    },
-                );*/
+                        console.log(this.newUser.userName);
+                        // 将用户名保存进容器
+                        this.userNameOperate({type : '01', userName : this.newUser.userName});
+                        // 将用户名保存进localStorage，有效期30天
+                        Storage.saveWithExpirationTime("userName", this.newUser.userName, 2592000);
+                        // 跳转
+                        this.$router.push({ name : 'Index'});
+                    });
+                });
+            },
+
+            /**
+             * 用户点击了enter,确定提交
+             */
+            registerSubmit(ev) {
+                if(ev.keyCode !=13){
+                    return
+                }
+                console.log("111");
+                this.register();
+            },
+
+            /**
+             * 用户点击了enter, 确定提交验证码
+             */
+            captchaSubmit(ev) {
+                if(ev.keyCode !=13){
+                    return
+                }
+
+                this.captchaConfirm();
             },
 
             /** 弹窗开关
@@ -397,7 +416,14 @@
                     duration: 3000,
                 });
             },
+
+            ...mapMutations([
+                'userNameOperate'
+            ]),
         },
+        mounted() {
+            Storage.clear();
+        }
     }
 </script>
 
@@ -406,16 +432,14 @@
 
     /**页面样式*/
     .register {
-        height: 100vh;
-        widht: 100vw;
         background: url("../assets/img/register/register-bg.png") no-repeat fixed;
         background-size: 100% 100%;
         position: relative;
         &:after {
             content: "";
-            width: 100vw;
             height: 100vh;
-            /* inherit :属性继承， 前面为继承的父级属性*/
+            width: 100vw;
+            // inherit :属性继承， 前面为继承的父级属性
             background: inherit;
             position: absolute;
             filter: blur(3px);
@@ -531,7 +555,21 @@
                 div {
                     color: red;
                     margin-bottom: 0.02rem;
+                    overflow: hidden;
                 }
+
+                // 提示验证码错误的动画
+                .slide-fade-enter-active {
+                    transition: all .3s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+                }
+                .slide-fade-leave-active {
+                    transition: all .8s cubic-bezier(1.0, 0.8, 0.5, 1.0);
+                }
+                .slide-fade-enter, .slide-fade-leave-to {
+                    transform: translateY(-10px);
+                    opacity: 0;
+                }
+
                 .replace {
                     @include theme-color;
                     font-size: 0.06rem;
