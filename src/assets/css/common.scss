@@ -1,0 +1,28 @@
+
+/** 主题颜色 */
+@mixin theme-color {
+  color: #409EFF;
+}
+
+@mixin theme-background {
+  background: #409EFF;
+}
+
+/** 左右居中 */
+@mixin row-center {
+  display: flex;
+  justify-content: center;
+}
+
+/** 上下居中*/
+@mixin column-center {
+  display: flex;
+  align-content: center;
+}
+
+/** 上下居中，左右居中*/
+@mixin layout-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

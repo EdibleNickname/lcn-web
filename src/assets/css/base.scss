@@ -1,0 +1,80 @@
+ /** css reset */
+body,p,h1,h2,h3,h4,h5,ul,input,select{
+  padding: 0;
+  margin: 0;
+}
+li{
+  list-style: none;
+}
+a{
+  text-decoration: none;
+  color: black;
+}
+img{
+  vertical-align: top;
+  border: none;
+}
+
+/** clear float */
+.clear{
+  zoom: 1;
+}
+
+.clear:after{
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.none {
+  display: none;
+}
+
+/** 媒体自查询 */
+/** <=1023的设备 */
+@media (max-width: 1023px) {
+  html{ font-size: 160px }
+  body { font-size: 16px;}
+}
+
+/**>=1024的设备*/
+@media (min-width: 1024px){
+  html{ font-size: 180px }
+  body { font-size: 18px;}
+}
+
+/**>=1100的设备*/
+@media (min-width: 1100px) {
+  html{ font-size: 200px }
+  body { font-size: 20px;}
+}
+
+/**>=1280的设备*/
+@media (min-width: 1280px) {
+  html{ font-size: 220px; }
+  body { font-size: 22px;}
+}
+
+/** >=1366的设备 */
+@media (min-width: 1366px) {
+  html{ font-size: 240px; }
+  body { font-size: 24px;}
+}
+
+/** >=1440的设备 */
+@media (min-width: 1440px) {
+  html{ font-size: 250px !important; }
+  body { font-size: 25px;}
+}
+
+/** >=1680的设备 */
+@media (min-width: 1680px) {
+  html{ font-size: 280px; }
+  body { font-size: 28px; }
+}
+
+/** >=1920的设备 */
+@media (min-width: 1920px) {
+  html{ font-size: 330px; }
+  body { font-size: 33px;}
+}

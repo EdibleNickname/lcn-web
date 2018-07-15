@@ -1,0 +1,56 @@
+/** element-ui 样式重置*/
+
+// 注册页面
+.el-col{
+  height: 0.15rem;
+}
+
+.el-row {
+  height: 0.15rem;
+}
+
+.el-input {
+  height: 0.2rem;
+  .el-input__inner {
+    height: 0.15rem;
+    line-height: 0.15rem;
+    font-size: 0.06rem;
+  }
+}
+.el-button{
+  height: 0.15rem;
+  padding: 0 0.08rem;
+  span {
+    font-size: 0.06rem;
+    line-height: 0.15rem;
+    height: 0.15rem;
+  }
+}
+
+.el-dialog {
+  border-radius: 0.04rem;
+  .el-dialog__title{
+    font-size: 0.07rem;
+  }
+  .el-dialog__body {
+    border-top: 1px #ddd solid;
+    padding-bottom: 10px;
+  }
+}
+
+.el-message--success {
+   background-color: rgba(64, 158, 255, 0.4);
+   border-color: rgba(51, 255, 255,1);
+
+  .el-message__content {
+    color: rgba(102, 255, 204, 1);
+  }
+}
+
+.el-message .el-icon-success {
+  color: rgba(102, 255, 204, 1);
+}
+
+.el-message__closeBtn {
+  color: rgba(102, 255, 204, 1);
+}

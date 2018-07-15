@@ -1,29 +1,39 @@
 <template>
-  <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
+    <div id="content-wrapper">
+        <transition name="slide-fade">
+            <router-view />
+        </transition>
     </div>
-    <router-view/>
-  </div>
 </template>
 
-<style lang="scss">
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-}
-#nav {
-  padding: 30px;
-  a {
-    font-weight: bold;
-    color: #2c3e50;
-    &.router-link-exact-active {
-      color: #42b983;
+<script>
+    export default {
+        name: "App",
     }
-  }
-}
+</script>
+
+<style lang="scss">
+    @import "assets/css/base.scss";
+    @import "assets/css/element-ui";
+
+    html{
+        // 防止动画时出现滚动条
+       /* overflow-x: hidden ;*/
+        #content-wrapper {
+            // 准备进入和准备离开时的样式
+            .slide-fade-enter, .slide-fade-leave-to {
+                opacity: 0;
+            }
+            // 进入中的样式变化
+            .slide-fade-enter-active {
+                transition: all 0.5s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+            }
+            ///离开时的样式变化
+            .slide-fade-leave-active {
+                transition: all 0.1s cubic-bezier(1.0, 0.8, 0.5, 1.0);
+            }
+        }
+    }
+
+
 </style>

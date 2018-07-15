@@ -6,6 +6,8 @@
 >1. vue + vuex + vue-router
 >2. scss
 >3. axios
+>4. vuelidate(感觉不怎么好用)
+>5. element-ui
 
 
 ## 启动
