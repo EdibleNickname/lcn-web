@@ -4,7 +4,7 @@
         <div class="content">
            <!--logo和注册的标题-->
            <div class="header">
-               <img src="../assets/logo.png"/>
+               <img src="../../assets/logo.png"/>
                <span>注册</span>
            </div>
 
@@ -130,7 +130,7 @@
 
 <script>
     import { mapMutations } from 'vuex';
-    import Storage from '../utils/storage';
+    import Storage from '../../utils/storage';
 
     export default {
         name: "register",
@@ -156,7 +156,7 @@
                     /** 控制弹弹窗的消失或出现*/
                     dialogVisible: false,
                     /**加载验证码的等待图片*/
-                    img: require("../assets/img/common/loading.gif"),
+                    img: require("../../assets/img/common/loading.gif"),
                     /** redis存放验证码答案对应的key */
                     redisKey: "",
                     /**控制错误提示框的出现消失*/
@@ -428,11 +428,11 @@
 </script>
 
 <style scoped lang="scss">
-    @import "../assets/css/common.scss";
+    @import "../../assets/css/common";
 
     /**页面样式*/
     .register {
-        background: url("../assets/img/register/register-bg.png") no-repeat fixed;
+        background: url("../../assets/img/register/register-bg.png") no-repeat fixed;
         background-size: 100% 100%;
         position: relative;
         &:after {

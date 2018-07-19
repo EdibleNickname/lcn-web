@@ -4,9 +4,8 @@
         <router-link tag="span" to="/login">登录</router-link>
         <div></div>
         <router-link tag="span" to="/register">注册</router-link>
-<!--        <div style="background: #409EFF; height: 100px;">
-            主页内容
-        </div>-->
+        <div></div>
+        <router-link tag="span" to="/completeInfo">个人信息完善页面</router-link>
     </div>
 </template>
 
