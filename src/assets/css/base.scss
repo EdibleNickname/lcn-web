@@ -30,6 +30,10 @@ img{
   display: none;
 }
 
+html, body {
+  min-width: 980px;
+}
+
 /** 媒体自查询 */
 /** <=1023的设备 */
 @media (max-width: 1023px) {

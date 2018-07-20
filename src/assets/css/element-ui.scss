@@ -11,10 +11,19 @@
 
 .el-input {
   height: 0.2rem;
+  /** 使 el-input 头部能够对齐 */
+  vertical-align: top;
   .el-input__inner {
     height: 0.15rem;
     line-height: 0.15rem;
     font-size: 0.06rem;
+  }
+  // 使 components/PersonalInfo 时间选择 el-date-picker 里面的图标居中
+  .el-input__prefix {
+    height: 0.15rem;
+  }
+  .el-input__icon {
+    line-height: 0.15rem;
   }
 }
 .el-button{
