@@ -297,19 +297,20 @@
 
                     let url = "/open/register/registerUser";
                     this.$post(url, data).then( resp => {
-                        console.log(resp);
                         // 验证成功
                         if(resp.answer != "success") {
                             this.showMessage('01', resp.hint);
                             this.newUser.authCode = "";
                             return;
                         }
-
-                        console.log(this.newUser.userName);
+                        let userInfo = {
+                            userName:  this.newUser.userName,
+                            userId: resp.userId,
+                        };
                         // 将用户名保存进容器
-                        this.userNameOperate({type : '01', userName : this.newUser.userName});
+                        this.userInfoOperate({type : '01', userInfo});
                         // 将用户名保存进localStorage，有效期30天
-                        Storage.saveWithExpirationTime("userName", this.newUser.userName, 2592000);
+                        Storage.saveWithExpirationTime("userInfo", userInfo, 2592000);
                         // 跳转
                         this.$router.push({ name : 'Index'});
                     });
@@ -418,7 +419,7 @@
             },
 
             ...mapMutations([
-                'userNameOperate'
+                'userInfoOperate'
             ]),
         },
         mounted() {

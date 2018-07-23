@@ -56,13 +56,13 @@
                 <el-col :span="19">
                     <el-radio-group v-model="userInfo.sex">
                         <el-radio :label="0">
-                            <span class="sexFont">男</span>
+                            <span class="font">男</span>
                         </el-radio>
                         <el-radio :label="1">
-                            <span class="sexFont">女</span>
+                            <span class="font">女</span>
                         </el-radio>
                         <el-radio :label="2">
-                            <span class="sexFont">保密</span>
+                            <span class="font">保密</span>
                         </el-radio>
                     </el-radio-group>
                 </el-col>
@@ -73,33 +73,42 @@
         <div class="headerPortrait">
             <p class="title">来，选一个头像吧</p>
 
+            <div class="horizontalLine"></div>
+
             <div class="image">
 
                 <div class="area">
-                    <p>裁剪</p>
                     <div class="container">
                         <croppa
                             v-model="croppa"
-                            :canvas-color="croppStyle.canvasColor"
-                            :width="croppStyle.width"
-                            :height="croppStyle.height"
-                            :prevent-white-space="croppStyle.preventWhiteSpace"
-                            :zoom-speed="croppStyle.zoomSpeed"
-                            :quality="croppStyle.quality"
-                            :placeholder="croppStyle.placeholder" />
+                            :canvas-color="croppaStyle.canvasColor"
+                            :width="croppaStyle.width"
+                            :height="croppaStyle.height"
+                            :prevent-white-space="croppaStyle.preventWhiteSpace"
+                            :zoom-speed="croppaStyle.zoomSpeed"
+                            :quality="croppaStyle.quality"
+                            :placeholder="croppaStyle.placeholder"
+                            @new-image-drawn="updatePreviewImage"
+                            @image-remove="removeImage"/>
                     </div>
                 </div>
 
                 <div class="clapboard"></div>
 
                 <div class="area">
-                    <p>当前头像</p>
                     <div class="container">
-
+                        <img :src="headerPortrait"/>
+                        <p>当前头像</p>
                     </div>
                 </div>
 
             </div>
+        </div>
+
+        <div class="btn">
+            <el-button type="primary" @click="save">
+                <div class="save">保存</div>
+            </el-button>
         </div>
 
     </div>
@@ -109,6 +118,18 @@
     export default {
         name: "personalInfo",
         props: {
+            userProfile: {
+                type: Object,
+                default: ()=> {
+                    return {
+                        userName: "",
+                        headerPortrait: "",
+                        birthday: "",
+                        sex: "",
+                        selfIntroduction: "",
+                    }
+                }
+            },
             defaultUrl : {
                 type: String,
                 default: "https://s1.ax1x.com/2018/07/17/Pl4n81.png",
@@ -121,13 +142,13 @@
         data() {
             return {
                 userInfo: {
-                    userName: "1234",
-                    selfIntroduction: "",
-                    birthday: "",
-                    sex: 0
+                    userName: this.userProfile.userName ? this.userProfile.userName : "",
+                    selfIntroduction: this.userProfile.userName ? this.userProfile.selfIntroduction : "",
+                    birthday: this.userProfile.birthday ? this.userProfile.birthday : "",
+                    sex: this.userProfile.sex ? this.userProfile.sex : 2,
                 },
                 // 用户的头像
-                headerPortrait: "",
+                headerPortrait: this.defaultUrl,
                 pickerOptions: {
                     // 时间选择期，无法选择大于当前的时间
                     disabledDate(time) {
@@ -136,8 +157,10 @@
                 },
                 croppa : {
                 },
+                // 是否正在生成缩略图中
+                generatingFlag: false,
                 // cropp的样式
-                croppStyle : {
+                croppaStyle : {
                     width: 180,
                     height: 180,
                     canvasColor: '#f1f2f5',
@@ -147,6 +170,46 @@
                     placeholder: "请选择您的头像"
                 },
             }
+        },
+        watch: {
+            // 实时观察croppa.imagData的变化
+            'croppa.imgData': {
+                handler(){
+                    if(!this.generatingFlag){
+                        this.updatePreviewImage();
+                    }
+                },
+                deep: true
+            }
+        },
+        methods: {
+            save() {
+                this.croppa.generateBlob( blob => {
+
+                    if(!blob) {
+                        this.$emit("save", this.userInfo, false);
+                        return;
+                    }
+
+                    this.$emit("save", this.userInfo, true, blob);
+                    return;
+                }, "image/jpg");
+            },
+            // 实时更新预览
+            updatePreviewImage() {
+                this.generatingFlag = true;
+                this.croppa.generateBlob( blob => {
+                    if(blob){
+                        let url = URL.createObjectURL(blob);
+                        this.headerPortrait = url;
+                        this.generatingFlag = false;
+                    }
+                });
+            },
+            // 删除了头像
+            removeImage() {
+                this.headerPortrait = this.defaultUrl;
+            }
         }
     }
 </script>
@@ -154,10 +217,7 @@
 <style scoped lang="scss">
 
     .personalInfo {
-        padding-left: 0.8rem;
-        border: 1px solid black;
         padding-top: 0.1rem;
-        margin-top: 100px;
 
         .input-wrapper {
             margin-bottom: 0.1rem;
@@ -167,10 +227,13 @@
                 text-align: right;
                 padding-right: 0.1rem;
                 margin-top: 0.02rem;
+                text-shadow: 1px 1px black;
             }
-            .sexFont {
+            span {
                 font-size: 0.07rem;
                 line-height: 0.07rem;
+                color: white;
+                text-shadow: 1px 1px black;
             }
         }
 
@@ -205,10 +268,72 @@
                 margin-right: 12%;
                 padding-right: 0.04rem;
             }
+            .horizontalLine {
+                background: #c0c0c0;
+                height: 2px;
+                margin: 0.04rem 0.08rem;
+            }
             .image {
+                padding-top: 0.02rem;
+                display: flex;
+                justify-content: center;
+                position: relative;
 
+                .area {
+                    width: 40%;
+                    min-width: 200px;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+
+                    &:last-child .container {
+                        margin: 10% auto;
+                    }
+
+                    @media screen and (max-width: 1100px) {
+                        &:last-child .container {
+                            margin: 15% auto;
+                        }
+                    }
+
+                    @media screen and (max-width: 1024px) {
+                        &:last-child .container {
+                            margin: 20% auto;
+                        }
+                    }
+
+                    .container {
+                        height: 100%;
+                        padding-right: 0.2rem;
+                        img {
+                            width: 0.4rem;
+                            height: 0.4rem;
+                            border: 0.008rem solid gray;
+                            border-radius: 50%;
+                        }
+                        p {
+                            text-align: center;
+                            margin-top: 0.04rem;
+                            font-size: 0.07rem;
+                        }
+                    }
+                }
+
+                .clapboard {
+                    background: #e5e9ef;
+                    width: 2px;
+                    margin: 0.04rem 0 0.2rem 0;
+                }
             }
         }
 
+        .btn {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 0.1rem;
+            .save {
+                padding: 0 0.1rem;
+            }
+        }
     }
 </style>

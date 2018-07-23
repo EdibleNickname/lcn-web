@@ -19,11 +19,11 @@
     font-size: 0.06rem;
   }
   // 使 components/PersonalInfo 时间选择 el-date-picker 里面的图标居中
-  .el-input__prefix {
+  .el-input__prefix, .el-input__suffix {
     height: 0.15rem;
-  }
-  .el-input__icon {
-    line-height: 0.15rem;
+    .el-input__icon {
+      line-height: 0.15rem;
+    }
   }
 }
 .el-button{
@@ -62,4 +62,10 @@
 
 .el-message__closeBtn {
   color: rgba(102, 255, 204, 1);
+}
+
+// 个人信息完善组件
+.el-radio__input.is-checked+.el-radio__label span.font {
+  color: #409EFF;
+  text-shadow: 0px 0px transparent;
 }

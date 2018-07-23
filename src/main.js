@@ -18,11 +18,13 @@ import App from './App.vue';
 import "./assets/js/validate/validate.js";
 
 /** 网络请求 */
-import {$get, $post} from './api/api.js';
+import { $get, $post, $put, $upload } from './api/api.js';
+
 /** 全局挂载*/
 Vue.prototype.$get = $get;
 Vue.prototype.$post = $post;
-
+Vue.prototype.$put = $put;
+Vue.prototype.$upload = $upload;
 
 /** 打印启动的错误日志 */
 Vue.config.productionTip = true;

@@ -48,6 +48,38 @@ const Storage = {
     },
 
     /**
+     * 更新数据
+     * @param key
+     * @param value
+     */
+    update(key, value) {
+        // 不支持localStorage
+        if(!localStorage) {
+            return false;
+        }
+
+        if(key == null) {
+            return false;
+        }
+
+        let val = localStorage.getItem(key);
+
+        if(!val) {
+            return false;
+        }
+
+        let oldData = JSON.parse(val);
+        let exp = oldData.exp;
+        let newData;
+        if(exp) {
+            newData = {val: value, exp: exp};
+        } else {
+            newData = value;
+        }
+        localStorage.setItem(key, JSON.stringify(newData));
+    },
+
+    /**
      * 从localStorage中查询出对应的值
      *
      * @param key
