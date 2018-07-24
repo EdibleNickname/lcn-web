@@ -94,7 +94,7 @@
                </div>
 
                <div class="btn">
-                   <el-button>取消</el-button>
+                   <el-button @click="cancelRegister">取消</el-button>
                    <el-button type="primary" @click="register">提交</el-button>
                </div>
            </div>
@@ -310,7 +310,7 @@
                         // 将用户名保存进容器
                         this.userInfoOperate({type : '01', userInfo});
                         // 跳转
-                        this.$router.push({ name : 'Index'});
+                        this.$router.push({ name : 'completeInfo'});
                     });
                 });
             },
@@ -322,7 +322,6 @@
                 if(ev.keyCode !=13){
                     return
                 }
-                console.log("111");
                 this.register();
             },
 
@@ -337,6 +336,13 @@
                 this.captchaConfirm();
             },
 
+            /**
+             * 取消，返回到主页
+             */
+            cancelRegister() {
+                // 跳转
+                this.$router.push({ name : 'index'});
+            },
             /** 弹窗开关
              *  type : 01 弹窗消失    02开启弹窗
              */

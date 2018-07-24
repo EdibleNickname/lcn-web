@@ -12,7 +12,7 @@
         <div></div>
         <router-link tag="span" to="/register">注册</router-link>
         <div></div>
-        <router-link tag="span" to="/completeInfo">个人信息完善页面</router-link>
+        <router-link tag="span" to="/completeInfo">个人信息完善页面(注册成功，才点哦)</router-link>
     </div>
 </template>
 
