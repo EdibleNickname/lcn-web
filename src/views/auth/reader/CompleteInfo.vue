@@ -30,6 +30,7 @@
             ])
         },
         methods: {
+            // 保存信息
             save(baseData, isUploadImg, blob) {
 
                 // 基础信息更新url
@@ -96,8 +97,9 @@
                                     });
                                     return;
                                 }
+
                                 let info = {
-                                    headerUrl: resp.path,
+                                    headerUrl: this.urlAddTimestamp(resp.path),
                                     userId: resp.userId,
                                 };
                                 this.updateUserInfo(info);
@@ -109,6 +111,12 @@
                 return;
             },
 
+            // 给用户的头像url添加一个当前的时间戳，防止缓存
+            urlAddTimestamp(url) {
+                let timestamp = (new Date()).valueOf();
+                let newUrl = url + "?timestamp" + timestamp;
+                return newUrl;
+            },
             ...mapMutations([
                 'updateUserInfo'
             ]),

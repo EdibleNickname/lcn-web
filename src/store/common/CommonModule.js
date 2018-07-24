@@ -21,6 +21,8 @@ const mutations= {
         if(data.type == '01') {
             if(data.userInfo != null) {
                 state.userInfo = data.userInfo;
+                // 将用户名保存进localStorage，有效期30天
+                Storage.saveWithExpirationTime("userInfo", data.userInfo, 2592000);
             }
             return;
         }

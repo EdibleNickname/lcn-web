@@ -290,7 +290,7 @@
                     let data = {
                         userName : this.newUser.userName,
                         password : this.newUser.password,
-                        email : encodeURIComponent(this.newUser.email),
+                        email : this.newUser.email,
                         authCode : this.newUser.authCode,
                         emailRedisKey: this.newUser.eMailRedisKey,
                     };
@@ -309,8 +309,6 @@
                         };
                         // 将用户名保存进容器
                         this.userInfoOperate({type : '01', userInfo});
-                        // 将用户名保存进localStorage，有效期30天
-                        Storage.saveWithExpirationTime("userInfo", userInfo, 2592000);
                         // 跳转
                         this.$router.push({ name : 'Index'});
                     });
