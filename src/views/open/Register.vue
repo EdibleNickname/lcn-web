@@ -4,7 +4,7 @@
         <div class="content">
            <!--logo和注册的标题-->
            <div class="header">
-               <img src="../assets/logo.png"/>
+               <img src="../../assets/logo.png"/>
                <span>注册</span>
            </div>
 
@@ -94,7 +94,7 @@
                </div>
 
                <div class="btn">
-                   <el-button>取消</el-button>
+                   <el-button @click="cancelRegister">取消</el-button>
                    <el-button type="primary" @click="register">提交</el-button>
                </div>
            </div>
@@ -130,7 +130,7 @@
 
 <script>
     import { mapMutations } from 'vuex';
-    import Storage from '../utils/storage';
+    import Storage from '../../utils/storage';
 
     export default {
         name: "register",
@@ -156,7 +156,7 @@
                     /** 控制弹弹窗的消失或出现*/
                     dialogVisible: false,
                     /**加载验证码的等待图片*/
-                    img: require("../assets/img/common/loading.gif"),
+                    img: require("../../assets/img/common/loading.gif"),
                     /** redis存放验证码答案对应的key */
                     redisKey: "",
                     /**控制错误提示框的出现消失*/
@@ -290,28 +290,27 @@
                     let data = {
                         userName : this.newUser.userName,
                         password : this.newUser.password,
-                        email : encodeURIComponent(this.newUser.email),
+                        email : this.newUser.email,
                         authCode : this.newUser.authCode,
                         emailRedisKey: this.newUser.eMailRedisKey,
                     };
 
                     let url = "/open/register/registerUser";
                     this.$post(url, data).then( resp => {
-                        console.log(resp);
                         // 验证成功
                         if(resp.answer != "success") {
                             this.showMessage('01', resp.hint);
                             this.newUser.authCode = "";
                             return;
                         }
-
-                        console.log(this.newUser.userName);
+                        let userInfo = {
+                            userName:  this.newUser.userName,
+                            userId: resp.userId,
+                        };
                         // 将用户名保存进容器
-                        this.userNameOperate({type : '01', userName : this.newUser.userName});
-                        // 将用户名保存进localStorage，有效期30天
-                        Storage.saveWithExpirationTime("userName", this.newUser.userName, 2592000);
+                        this.userInfoOperate({type : '01', userInfo});
                         // 跳转
-                        this.$router.push({ name : 'Index'});
+                        this.$router.push({ name : 'completeInfo'});
                     });
                 });
             },
@@ -323,7 +322,6 @@
                 if(ev.keyCode !=13){
                     return
                 }
-                console.log("111");
                 this.register();
             },
 
@@ -338,6 +336,13 @@
                 this.captchaConfirm();
             },
 
+            /**
+             * 取消，返回到主页
+             */
+            cancelRegister() {
+                // 跳转
+                this.$router.push({ name : 'index'});
+            },
             /** 弹窗开关
              *  type : 01 弹窗消失    02开启弹窗
              */
@@ -418,7 +423,7 @@
             },
 
             ...mapMutations([
-                'userNameOperate'
+                'userInfoOperate'
             ]),
         },
         mounted() {
@@ -428,11 +433,11 @@
 </script>
 
 <style scoped lang="scss">
-    @import "../assets/css/common.scss";
+    @import "../../assets/css/common";
 
     /**页面样式*/
     .register {
-        background: url("../assets/img/register/register-bg.png") no-repeat fixed;
+        background: url("../../assets/img/register/register-bg.png") no-repeat fixed;
         background-size: 100% 100%;
         position: relative;
         &:after {

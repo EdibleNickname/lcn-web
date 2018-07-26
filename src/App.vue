@@ -15,6 +15,7 @@
 <style lang="scss">
     @import "assets/css/base.scss";
     @import "assets/css/element-ui";
+    @import "assets/css/croppa";
 
     html{
         // 防止动画时出现滚动条
