@@ -103,7 +103,7 @@
                                     userId: resp.userId,
                                 };
                                 this.updateUserInfo(info);
-                                this.$router.push({ name : 'Index'});
+                                this.$router.push({ name : 'index'});
                             }
                         );
 

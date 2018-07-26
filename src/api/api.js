@@ -10,10 +10,10 @@ const TOKEN_PREFIX = "lcn";
 // 为用户分配的请求jwt
 let jwt = null ;
 
-//基础的api部分  http://120.78.142.208/
+//基础的api部分  http://112.74.180.179/
 axios.defaults.baseURL = "http://localhost:81";
 //请求超时时间
-axios.defaults.timeout = 5000;
+axios.defaults.timeout = 8000;
 // 默认的json请求
 axios.defaults.headers.post['Content-Type'] = 'application/json;charset=utf-8';
 axios.defaults.headers.put['Content-Type'] = 'application/json;charset=utf-8';
