@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Message } from 'element-ui';
 
-import Storage from '../utils/storage';
+import Storage from '../utils/Storage';
 
 // localStorage存放在token的key值
 const TOKEN_KEY = "jwtToken";
@@ -10,7 +10,7 @@ const TOKEN_PREFIX = "lcn";
 // 为用户分配的请求jwt
 let jwt = null ;
 
-//基础的api部分  http://112.74.180.179/
+//基础的api部分  http://47.106.126.50/
 axios.defaults.baseURL = "http://localhost:81";
 //请求超时时间
 axios.defaults.timeout = 8000;

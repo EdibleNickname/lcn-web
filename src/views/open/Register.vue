@@ -130,7 +130,9 @@
 
 <script>
     import { mapMutations } from 'vuex';
-    import Storage from '../../utils/storage';
+    import Storage from '../../utils/Storage';
+    import request from '../../api/request/open/RegisterRequest';
+    import regxUtil from '../../utils/RegxUtil';
 
     export default {
         name: "register",
@@ -191,9 +193,8 @@
                 if(this.newUser.userName.length<3 || this.newUser.userName.length> 10) {
                     return;
                 }
-                // 拼接验证用户名是否存在的api
-                let url = "/open/register/queryUserNameIsExist/"+ this.newUser.userName;
-                const data = await this.$get(url);
+
+                const data = await request.userNameIsExist(this.newUser.userName);
                 this.unique.userNameUnique = Boolean(data);
             },
 
@@ -209,29 +210,24 @@
                     return;
                 }
 
-                let emailRegx = /^([a-z0-9A-Z]+[-|\.]?)+[a-z0-9A-Z]@([a-z0-9A-Z]+(-[a-z0-9A-Z]+)?\.)+[a-zA-Z]{2,}$/;
-                if(!emailRegx.test(this.newUser.email)){
+                if(!regxUtil.emailValidate(this.newUser.email)) {
                     // 邮箱格式错误不验证
                     return;
                 }
-                let url = "/open/register/"+encodeURIComponent(this.newUser.email)+"/queryEmailIsExist";
-                const data = await this.$get(url);
+
+                const data = await request.emailIsExist(this.newUser.email);
                 this.unique.emailUnique = Boolean(data);
             },
 
             /** 获取验证码 */
-            getCaptcha() {
-                let url = "/open/captcha/generateCaptcha";
-                this.$get(url).then(
-                    resp => {
-                        this.captcha.img = 'data:image/jpeg;base64,'+resp.captchaImg;
-                        this.captcha.redisKey = resp.redisKey;
-                    }
-                );
+            async getCaptcha() {
+                const data = await request.getCaptcha();
+                this.captcha.img = 'data:image/jpeg;base64,'+data.captchaImg;
+                this.captcha.redisKey = data.redisKey;
             },
 
             /** 验证码验证 */
-            captchaConfirm() {
+            async captchaConfirm() {
                 // 输入的验证码的长度不对
                 if(this.captcha.answer.length != this.captcha.length) {
                     this.captcha.captchaResult = true;
@@ -243,23 +239,23 @@
                     this.captcha.captchaResult = true;
                     return;
                 }
-                let url = "/open/register/validCaptcha/"+ this.captcha.answer +"/"+ encodeURIComponent(this.newUser.email) + "/" + this.captcha.redisKey;
-                this.$get(url).then(
-                    resp => {
-                        if(resp.answer != "success") {
-                            this.captcha.captchaResult = true;
-                            this.getCaptcha();
-                            return;
-                        }
-                        // 验证码验证通过
-                        this.captcha.dialogVisible = false;
-                        this.captcha.answer = "";
-                        this.captcha.showTimer = false;
-                        this.newUser.eMailRedisKey = resp.eMailRedisKey;
-                        this.captchaTimer();
-                        this.showMessage('02', '验证码已发送到您的邮箱，请注意查收');
-                    }
-                );
+
+                const resp = await request.validCaptcha(this.captcha.answer, this.newUser.email, this.captcha.redisKey);
+
+                if(resp.answer != "success") {
+                    this.captcha.captchaResult = true;
+                    this.getCaptcha();
+                    return;
+                }
+
+                // 验证码验证通过
+                this.captcha.dialogVisible = false;
+                this.captcha.answer = "";
+                this.captcha.showTimer = false;
+                this.newUser.eMailRedisKey = resp.eMailRedisKey;
+                this.captchaTimer();
+                this.showMessage('02', '验证码已发送到您的邮箱，请注意查收');
+
             },
 
             /** 业务方法 */
@@ -286,32 +282,24 @@
                         return;
                     }
 
-                    // 请求参数
-                    let data = {
-                        userName : this.newUser.userName,
-                        password : this.newUser.password,
-                        email : this.newUser.email,
-                        authCode : this.newUser.authCode,
-                        emailRedisKey: this.newUser.eMailRedisKey,
-                    };
-
-                    let url = "/open/register/registerUser";
-                    this.$post(url, data).then( resp => {
-                        // 验证成功
-                        if(resp.answer != "success") {
-                            this.showMessage('01', resp.hint);
-                            this.newUser.authCode = "";
-                            return;
-                        }
-                        let userInfo = {
-                            userName:  this.newUser.userName,
-                            userId: resp.userId,
-                        };
-                        // 将用户名保存进容器
-                        this.userInfoOperate({type : '01', userInfo});
-                        // 跳转
-                        this.$router.push({ name : 'completeInfo'});
-                    });
+                    // 网络请求
+                    request.registerUser(this.newUser.userName, this.newUser.password, this.newUser.email, this.newUser.authCode, this.newUser.eMailRedisKey)
+                        .then( resp => {
+                            // 注册失败
+                            if(resp.answer != "success") {
+                                this.showMessage('01', resp.hint);
+                                this.newUser.authCode = "";
+                                return;
+                            }
+                            let userInfo = {
+                                userName:  this.newUser.userName,
+                                userId: resp.userId,
+                            };
+                            // 将用户名保存进localStorage
+                            this.userInfoOperate({type : '01', userInfo});
+                            // 路由跳转
+                            this.$router.push({ name : 'completeInfo'});
+                        });
                 });
             },
 
@@ -434,10 +422,11 @@
 
 <style scoped lang="scss">
     @import "../../assets/css/common";
+    @import "../../assets/css/oss-img";
 
     /**页面样式*/
     .register {
-        background: url("../../assets/img/register/register-bg.png") no-repeat fixed;
+        @include register-bg;
         background-size: 100% 100%;
         position: relative;
         &:after {

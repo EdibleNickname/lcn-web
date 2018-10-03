@@ -1,12 +1,8 @@
 <template>
-    <div>
-        <h1 v-if="getUserInfo != null">
-            {{getUserInfo.userName}}
-            <h1 v-if="getUserInfo.headerUrl != null">
-                <img :src="getUserInfo.headerUrl"  style="width: 100px; height: 100px; border-radius: 50px;"/>
-            </h1>
-        </h1>
-        <h1 v-else>还未登录</h1>
+    <div class="index">
+
+        <index-header/>
+
 
         <router-link tag="span" to="/login">登录</router-link>
         <div></div>
@@ -17,7 +13,9 @@
 </template>
 
 <script>
-    import { mapGetters } from 'vuex';
+
+    import IndexHeader from '@/components/index/IndexHeader';
+
     export default {
         name: "index",
         date() {
@@ -25,14 +23,14 @@
 
             }
         },
-        computed: {
-            ...mapGetters([
-                'getUserInfo'
-            ])
+        components: {
+            indexHeader: IndexHeader,
         }
     }
 </script>
 
-<style scoped lang="scss" type="text/css">
+<style scoped lang="scss">
+    .index {
 
+    }
 </style>

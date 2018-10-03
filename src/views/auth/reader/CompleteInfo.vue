@@ -2,10 +2,10 @@
     <div class="completeInfo" style="display: flex">
         <div class="container">
             <personal-info
-                    :userProfile="getUserInfo"
-                    :userNameEditable="true"
-                    :defaultUrl="defaultHeaderPortraitUrl"
-                    @save="save"/>
+                :userProfile="getUserInfo"
+                :userNameEditable="true"
+                :defaultUrl="defaultHeaderPortraitUrl"
+                @save="save"/>
         </div>
     </div>
 </template>
@@ -13,12 +13,15 @@
 <script>
 
     import { mapGetters, mapMutations } from 'vuex';
-    import PersonalInfo from '@/components/PersonalInfo';
+    import PersonalInfo from '@/components/common/PersonalInfo';
+    import request from '@/api/request/auth/reader/CompleteInfoRequest.js';
+    import OssImgUrl from '@/assets/js/alibaba-oss/oss-img.js';
+
     export default {
         name: "CompleteInfo",
         data() {
             return {
-                defaultHeaderPortraitUrl: "https://s1.ax1x.com/2018/07/17/Pl4n81.png",
+                defaultHeaderPortraitUrl: OssImgUrl.index.defaultHeaderUrl,
             }
         },
         components: {
@@ -33,46 +36,35 @@
             // 保存信息
             save(baseData, isUploadImg, blob) {
 
-                // 基础信息更新url
-                let baseDataUrl = "/info/uploadBaseData";
-
-                // 头像上传url
-                let headerPortraitUrl ="/info/uploadHeaderPortrait";
-
-                let putData = {
-                    userName: baseData.userName,
-                    birthday: baseData.birthday,
-                    introduce: baseData.selfIntroduction,
-                    sex: baseData.sex,
-                    isModify: isUploadImg ? 1 : 0,
-                };
                 if(!isUploadImg) {
-                  //  没有上传图片
-                    this.$put(baseDataUrl, putData).then(resp => {
-                        if(resp.isSuccess != "1") {
-                            // 提示
-                            this.$message({
-                                showClose: true,
-                                message: "更新用户信息失败",
-                                type: 'warning',
-                            });
-                            return;
-                        }
+                    //  没有上传图片
+                    request.updateUserInfo(baseData.userName, baseData.birthday, baseData.selfIntroduction, baseData.sex, isUploadImg)
+                        .then( resp => {
+                            if(resp.isSuccess != "1") {
+                                // 提示
+                                this.$message({
+                                    showClose: true,
+                                    message: "更新用户信息失败",
+                                    type: 'warning',
+                                });
+                                return;
+                            }
 
-                        let info = {
-                            userId: resp.userId,
-                        };
-                        this.updateUserInfo(info);
-                        console.log("更新成功");
-                        this.$router.push({ name : 'Index'});
+                            let info = {
+                                userId: resp.userId,
+                            };
 
-                    });
+                            this.updateUserInfo(info);
+                            this.$router.push({ name : 'Index'});
+                        });
                     return;
                 }
+
                 // 上传了图片
-                this.$put(baseDataUrl, putData).then(
-                    resp => {
-                        if(resp.isSuccess != "1") {
+                request.updateUserInfo(baseData.userName, baseData.birthday, baseData.selfIntroduction, baseData.sex, isUploadImg)
+                    .then( resp => {
+                        console.log(resp);
+                        if( resp.isSuccess != "1") {
                             // 提示
                             this.$message({
                                 showClose: true,
@@ -82,12 +74,9 @@
                             return;
                         }
 
-                        let fd = new FormData();
+                        request.uploadFile(blob, baseData.userName + ".jpg", resp.redisKey)
+                            .then( resp => {
 
-                        fd.append("file", blob, baseData.userName+".jpg");
-                        fd.append("redisKey", resp.redisKey);
-                        this.$upload(headerPortraitUrl, fd).then(
-                            resp => {
                                 if(resp.isSuccess != "1") {
                                     // 提示
                                     this.$message({
@@ -104,17 +93,16 @@
                                 };
                                 this.updateUserInfo(info);
                                 this.$router.push({ name : 'index'});
-                            }
-                        );
+                            });
+                    });
 
-                });
                 return;
             },
 
             // 给用户的头像url添加一个当前的时间戳，防止缓存
             urlAddTimestamp(url) {
                 let timestamp = (new Date()).valueOf();
-                let newUrl = url + "?timestamp" + timestamp;
+                let newUrl = url + "?timestamp=" + timestamp;
                 return newUrl;
             },
             ...mapMutations([
@@ -125,8 +113,11 @@
 </script>
 
 <style scoped lang="scss">
+
+    @import "../../../assets/css/oss-img";
+
     .completeInfo{
-        background: url("../../../assets/img/register/register-bg.png") no-repeat fixed;
+        @include register-bg;
         background-size: 100% 100%;
         position: relative;
         &:after {

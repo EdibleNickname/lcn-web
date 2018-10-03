@@ -1,5 +1,5 @@
 
-import Storage from '../../utils/storage';
+import Storage from '../../utils/Storage';
 
 const state = {
     userInfo : Storage.query("userInfo"),

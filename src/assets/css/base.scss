@@ -19,20 +19,20 @@ img{
 .clear{
   zoom: 1;
 }
-
 .clear:after{
   content: "";
   display: block;
   clear: both;
 }
 
-.none {
-  display: none;
-}
-
 html, body {
   min-width: 980px;
   color: #717171;
+}
+
+/** 屏幕宽度 1rem - 250px 1162px */
+.screen-width {
+  width: 4.64rem;
 }
 
 /** 媒体自查询 */

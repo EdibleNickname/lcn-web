@@ -115,6 +115,9 @@
 </template>
 
 <script>
+
+    import OssImgUrl from '@/assets/js/alibaba-oss/oss-img.js';
+
     export default {
         name: "personalInfo",
         props: {
@@ -132,7 +135,7 @@
             },
             defaultUrl : {
                 type: String,
-                default: "https://s1.ax1x.com/2018/07/17/Pl4n81.png",
+                default: OssImgUrl.index.defaultHeaderUrl,
             },
             userNameEditable: {
                 type: Boolean,
