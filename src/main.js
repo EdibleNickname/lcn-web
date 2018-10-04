@@ -11,6 +11,9 @@ Vue.use(ElementUI);
 import Croppa from 'vue-croppa';
 Vue.use(Croppa);
 
+/** 引进swiper的样式 */
+require('swiper/dist/css/swiper.css');
+
 /** 需要放在element-ui的后面，否则放在App.vue里面的样式无法覆盖上面的样式*/
 import App from './App.vue';
 
