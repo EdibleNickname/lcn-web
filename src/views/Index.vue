@@ -3,6 +3,16 @@
 
         <index-header/>
 
+        <div class="content-body screen-width">
+
+            <index-body-top/>
+            <div class="content">
+                <index-body-left/>
+                <index-body-rigth/>
+            </div>
+
+        </div>
+
 
         <router-link tag="span" to="/login">登录</router-link>
         <div></div>
@@ -15,6 +25,10 @@
 <script>
 
     import IndexHeader from '@/components/index/IndexHeader';
+    import IndexBodyTop from '@/components/index/IndexBodyTop';
+    import IndexBodyLeft from '@/components/index/IndexBodyLeft';
+    import IndexBodyRigth from '@/components/index/IndexBodyRight';
+
 
     export default {
         name: "index",
@@ -24,13 +38,22 @@
             }
         },
         components: {
-            indexHeader: IndexHeader,
+            IndexHeader: IndexHeader,
+            IndexBodyTop: IndexBodyTop,
+            IndexBodyLeft: IndexBodyLeft,
+            IndexBodyRigth: IndexBodyRigth
         }
     }
 </script>
 
 <style scoped lang="scss">
     .index {
-
+        .content-body {
+            margin: 0 auto;
+            .content {
+                display: flex;
+                justify-content: space-between;
+            }
+        }
     }
 </style>

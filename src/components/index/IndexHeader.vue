@@ -1,6 +1,5 @@
 <template>
     <div class="header" :style="headerStyle">
-
         <!--导航栏-->
         <div class="navigator-bar-bg">
             <div class="navigator-bar screen-width">
@@ -15,7 +14,7 @@
 
                     <transition name="fade">
                         <div class="no-login-plank" v-show="blankShow" @mouseover="clearHeaderTimer" @mouseout="hideBlank">
-                            <p>登录后你可以:</p>
+                            <p>欢迎来到Lcn的网站</p>
                             <div class="img">
                                 <img :src="unLoginPlankStart" />
                                 <img :src="unLoginPlankStart" />
@@ -32,10 +31,14 @@
         </div>
 
         <!--搜索区-->
-        <div class="search-bar">
-
+        <div class="search-bar screen-width">
+            <div class="search-area">
+                <input placeholder="搜索栏" />
+                <span class="submit-btn">
+                    <i class="el-icon-search"></i>
+                </span>
+            </div>
         </div>
-
     </div>
 </template>
 
@@ -138,16 +141,11 @@
 
 <style scoped lang="scss">
     @import "../../assets/css/oss-img";
+    @import "../../assets/css/common";
 
     .header {
         height: 0.68rem;
-
-        .fade-enter-active, .fade-leave-active {
-            transition: opacity .8s;
-        }
-        .fade-enter, .fade-leave-to {
-            opacity: 0;
-        }
+        background: yellow;
 
         .navigator-bar-bg {
             height: 0.168rem;
@@ -155,11 +153,11 @@
             &:after {
                 content: "";
                 background: rgba(255, 255, 255, 0.5);
-                filter: blur(3px);
+                filter: blur(1px);
                 position: absolute;
                 z-index: 2;
                 height: 0.168rem;
-                width: 100vw;
+                width: 100%;
             }
 
             .navigator-bar {
@@ -261,6 +259,52 @@
                     }
                 }
             }
+        }
+
+        .search-bar {
+            height: 0.512rem;
+            display: flex;
+            justify-content: flex-end;
+            align-items: flex-end;
+            margin: 0 auto;
+            .search-area {
+                height: 0.128rem;
+                width: 1.12rem;
+                margin-bottom: 0.08rem;
+                background: green;
+                display: flex;
+                border-radius: 0.016rem;
+                overflow: hidden;
+                input {
+                    height: 0.128rem;
+                    flex-grow: 1;
+                    margin: 0;
+                    padding: 0 0 0 0.048rem;
+                    border: 0;
+                    font-size: 0.048rem;
+                    outline: none;
+                }
+                .submit-btn {
+                    width: 0.15rem;
+                    background: white;
+                    padding-left: 0.048rem;
+                    cursor: pointer;
+                    i {
+                        font-weight: bold;
+                        @include theme-color;
+                    }
+                    i:hover {
+                        color: red;
+                    }
+                }
+            }
+        }
+
+        .fade-enter-active, .fade-leave-active {
+            transition: opacity .8s;
+        }
+        .fade-enter, .fade-leave-to {
+            opacity: 0;
         }
 
         @keyframes logo-rotate-one {
