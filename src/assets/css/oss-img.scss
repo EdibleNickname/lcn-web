@@ -12,7 +12,7 @@ $baseUrl : 'https://lcn-website.oss-cn-shenzhen.aliyuncs.com/website';
 
 /** register(注册页面)的背景图 */
 @mixin register-bg {
-  background: url("https://lcn-public.oss-cn-shenzhen.aliyuncs.com/lcn-website/register/register-bg.png") no-repeat fixed;
+  background: url("#{$baseUrl}/page/register/register-bg.png") no-repeat fixed;
 }
 
 

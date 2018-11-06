@@ -18,6 +18,9 @@ const mutations= {
      * @param userName 需要保存的用户
      */
     userInfoOperate(state, data) {
+        // 删除旧的用户信息
+        Storage.remove("userInfo");
+
         if(data.type == '01') {
             if(data.userInfo != null) {
                 state.userInfo = data.userInfo;

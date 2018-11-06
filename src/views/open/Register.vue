@@ -228,14 +228,8 @@
 
             /** 验证码验证 */
             async captchaConfirm() {
-                // 输入的验证码的长度不对
-                if(this.captcha.answer.length != this.captcha.length) {
-                    this.captcha.captchaResult = true;
-                    return;
-                }
-                // 验证码格式 大小写数字4位数
-                var regx = /^([a-zA-Z]|\d){4}$/;
-                if(!regx.test(this.captcha.answer)) {
+
+                if(!regxUtil.captchaValidate(this.captcha.answer)) {
                     this.captcha.captchaResult = true;
                     return;
                 }

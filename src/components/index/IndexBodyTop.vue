@@ -28,11 +28,11 @@
         </div>
 
         <div class="right">
-            <ulr>
+            <ul>
                 <li>现在完成的功能有：</li>
                 <li>1.注册</li>
                 <li>2.注册完后，进行个人信息的完善</li>
-            </ulr>
+            </ul>
         </div>
     </div>
 </template>

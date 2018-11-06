@@ -19,7 +19,8 @@
                                 <img :src="unLoginPlankStart" />
                                 <img :src="unLoginPlankStart" />
                             </div>
-                            <el-button class="login-btn" type="primary">登录</el-button>
+
+                            <el-button class="login-btn" type="primary" @click="goToLogin">登录</el-button>
                             <p class="reg">首次使用？<router-link tag="span" to="/register">点我去注册</router-link></p>
                         </div>
                     </transition>
@@ -134,7 +135,12 @@
             },
             test() {
                 console.log(1234);
+            },
+            //跳转到登录页面
+            goToLogin() {
+                this.$router.push({ name : 'login'});
             }
+
         }
     }
 </script>
